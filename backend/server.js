@@ -12,6 +12,7 @@ import { clerkMiddleware } from '@clerk/express';
 import connectCloudinary from './configs/cloudinary.js';
 import courseRouter from './routes/courseRoute.js';
 import userRouter from './routes/userRoutes.js'
+import doubtRouter from './routes/doubtRoute.js';
 
 
 
@@ -93,7 +94,13 @@ app.use('/api/course',express.json(),courseRouter);
 
 app.use('/api/user',express.json(),userRouter)
 
+app.use("/api/doubts", express.json(), doubtRouter);
+
+
+
 app.post('/stripe',bodyParser.raw({type: 'application/json'}),stripeWebhooks)
+
+
 
 //Port
 
