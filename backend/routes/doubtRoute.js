@@ -14,9 +14,9 @@ import { protectEducator } from "../middlewares/authMiddleware.js";
 
 const doubtRouter = express.Router();
 
-doubtRouter.post('/create-doubt', requireAuth,createDoubt);
+doubtRouter.post('/create-doubt', requireAuth(),createDoubt);
 
-doubtRouter.get('/get-my-doubts',getDoubtsForStudent)
+doubtRouter.get("/get-my-doubts", requireAuth(), getDoubtsForStudent);
 
 doubtRouter.get('/get-doubts-educator',protectEducator,getDoubtsForEducator)
 

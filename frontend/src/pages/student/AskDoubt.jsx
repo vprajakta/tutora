@@ -6,7 +6,7 @@ import {toast} from 'react-toastify'
 import { AppContext } from "../../context/AppContext.jsx";
 
 const AskDoubt = () => {
-  const { backendUrl, getToken } = useContext(AppContext);
+  const { backendUrl, getToken, navigate } = useContext(AppContext);
   const [queryTitle, setQueryTitle] = useState("");
 
   const quillRef = useRef(null);
@@ -25,10 +25,10 @@ const AskDoubt = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submit triggered");
+    
     try {
       const token = await getToken();
-      console.log(token)
+      
       const { data } = await axios.post(
         backendUrl + "/api/doubts/create-doubt",
         {
@@ -39,12 +39,14 @@ const AskDoubt = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(data);
+      
 
       if (data.success) {
         toast.success(data.message);
         setQueryTitle("");
         quillRef.current.root.innerHTML = "";
+        navigate(`/player/${courseId}`);
+
       } else {
         toast.error(data.message);
       }

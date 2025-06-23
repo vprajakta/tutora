@@ -55,6 +55,7 @@ const Navbar = () => {
               {isEducator ? "Educator Dashboard" : "Become Educator"}
             </button>
             | <Link to="/my-enrollments">My Enrollments</Link>
+            | <Link to="/my-doubts">My Doubts</Link>
           </div>
         )}
         {user ? (
@@ -75,10 +76,12 @@ const Navbar = () => {
               <button onClick={becomeEducator}>
                 {isEducator ? "Educator Dashboard" : "Become Educator"}
               </button>
-              | <Link to="/my-enrollments">My Enrollments</Link>
+              | <Link to="/my-enrollments">My Enrollments</Link>|{" "}
+              <Link to="/my-doubts">My Doubts</Link>
             </>
           )}
         </div>
+
         {user ? (
           <UserButton />
         ) : (

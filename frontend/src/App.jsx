@@ -17,6 +17,7 @@ import { ToastContainer } from "react-toastify";
 import Lobby from "./screens/Lobby.jsx";
 import Room from "./screens/Room.jsx";
 import AskDoubt from "./pages/student/AskDoubt.jsx";
+import MyDoubts from "./pages/student/MyDoubts.jsx";
 
 const App = () => {
   const isEducatorRoute = useMatch("/educator/*");
@@ -30,7 +31,8 @@ const App = () => {
         <Route path="/course/:id" element={<CourseDetails />} />
         <Route path="/course-list/:input" element={<CoursesList />} />
         <Route path="/my-enrollments" element={<MyEnrollments />} />
-        <Route path="/player/:courseId" element={<Player />}/>
+        <Route path="/my-doubts" element={<MyDoubts />} />
+        <Route path="/player/:courseId" element={<Player />} />
         <Route
           path="/player/:courseId/lecture/:lectureId/ask-doubt"
           element={<AskDoubt />}

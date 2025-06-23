@@ -6,7 +6,7 @@ import Course from "../models/Course.js";
 export const createDoubt = async (req,res) => {
 
     try {
-        console.log(req)
+        
         const { courseId, lectureId, queryTitle, queryDetails } = req.body;
 
         const studentId = req.auth().userId;
