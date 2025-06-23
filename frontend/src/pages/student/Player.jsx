@@ -9,8 +9,10 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import Loading from '../../components/student/Loading';
 
+
 const Player = () => {
   const {enrolledCourses, calculateChapterTime,
+    navigate,
     backendUrl,
     getToken,
     userData,
@@ -27,6 +29,11 @@ const Player = () => {
   const [progressData,setProgressData] = useState(null)
 
   const [initialRating, setInitialRating] = useState(0)
+
+  const handleAskDoubt = () => {
+    const lectureId = playerData?.lectureId;
+    navigate(`/player/${courseId}/lecture/${lectureId}/ask-doubt`);
+  };
 
   const getCourseData = () => {
     enrolledCourses.map((course)=>{
@@ -214,6 +221,12 @@ const Player = () => {
                   {playerData.chapter}.{playerData.lecture}{" "}
                   {playerData.lectureTitle}
                 </p>
+                <button
+                  onClick={handleAskDoubt}
+                  className="text-blue-600 cursor-pointer"
+                >
+                  Ask Doubt
+                </button>
                 <button
                   onClick={() => markLectureAsCompleted(playerData.lectureId)}
                   className="text-blue-600 cursor-pointer"
