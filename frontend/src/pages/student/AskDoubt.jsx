@@ -25,9 +25,10 @@ const AskDoubt = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submit triggered");
     try {
       const token = await getToken();
-
+      console.log(token)
       const { data } = await axios.post(
         backendUrl + "/api/doubts/create-doubt",
         {
@@ -38,6 +39,7 @@ const AskDoubt = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log(data);
 
       if (data.success) {
         toast.success(data.message);
@@ -75,7 +77,7 @@ const AskDoubt = () => {
 
         <button
           type="submit"
-          className="bg-black text-white w-max py-2.5 px-8 rounded my-4"
+          className="bg-black text-white w-max py-2.5 px-8 rounded my-4 cursor-pointer"
         >
           Submit
         </button>
