@@ -18,6 +18,7 @@ import Lobby from "./screens/Lobby.jsx";
 import Room from "./screens/Room.jsx";
 import AskDoubt from "./pages/student/AskDoubt.jsx";
 import MyDoubts from "./pages/student/MyDoubts.jsx";
+import DoubtsDashboard from "./pages/educator/DoubtsDashboard.jsx";
 
 const App = () => {
   const isEducatorRoute = useMatch("/educator/*");
@@ -43,6 +44,7 @@ const App = () => {
           <Route path="add-course" element={<AddCourse />} />
           <Route path="my-courses" element={<MyCourses />} />
           <Route path="students-enrolled" element={<StudentsEnrolled />} />
+          <Route path="doubts-dashboard" element={<DoubtsDashboard/>} />
         </Route>
 
         <Route path="/lobby" element={<Lobby />} />

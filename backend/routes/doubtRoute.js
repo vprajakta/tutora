@@ -20,8 +20,8 @@ doubtRouter.get("/get-my-doubts", requireAuth(), getDoubtsForStudent);
 
 doubtRouter.get('/get-doubts-educator',protectEducator,getDoubtsForEducator)
 
-doubtRouter.post('/schedule-doubt/:doubtId', protectEducator, scheduleDoubtSession)
+doubtRouter.put('/schedule-doubt/:doubtId', protectEducator, scheduleDoubtSession)
 
-doubtRouter.post('/resolve-doubt/:doubtId',protectEducator,markDoubtResolved);
+doubtRouter.put('/resolve-doubt/:doubtId',protectEducator,markDoubtResolved);
 
 export default doubtRouter;

@@ -122,60 +122,7 @@ const Room = () => {
     ]);
 
     return (
-      // <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
-      //   <h1 className="text-3xl font-bold mb-2">Room Page</h1>
-      //   <h4 className="text-lg mb-4">
-      //     {remoteSocketId ? "🟢 Connected" : "🕐 Waiting for participant..."}
-      //   </h4>
-
-      //   <div className="flex gap-4 mb-6">
-      //     {myStream && (
-      //       <button
-      //         onClick={sendStreams}
-      //         className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-md transition"
-      //       >
-      //         Send Stream
-      //       </button>
-      //     )}
-      //     {remoteSocketId && (
-      //       <button
-      //         onClick={handleCallUser}
-      //         className="bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-md transition"
-      //       >
-      //         Call
-      //       </button>
-      //     )}
-      //   </div>
-
-      //   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
-      //     {myStream && (
-      //       <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg p-2">
-      //         <h2 className="text-center text-xl mb-2">My Stream</h2>
-      //         <ReactPlayer
-      //           playing
-      //           muted
-      //           height="100%"
-      //           width="100%"
-      //           url={myStream}
-      //           className="rounded-lg"
-      //         />
-      //       </div>
-      //     )}
-
-      //     {remoteStream && (
-      //       <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg p-2">
-      //         <h2 className="text-center text-xl mb-2">Remote Stream</h2>
-      //         <ReactPlayer
-      //           playing
-      //           height="100%"
-      //           width="100%"
-      //           url={remoteStream}
-      //           className="rounded-lg"
-      //         />
-      //       </div>
-      //     )}
-      //   </div>
-      // </div>
+      
       <div className="h-screen w-screen flex flex-col bg-gray-900 text-white">
         <div className="p-4 bg-gray-800 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Room Page</h1>

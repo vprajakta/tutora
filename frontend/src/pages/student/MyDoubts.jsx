@@ -8,28 +8,30 @@ const MyDoubts = () => {
   const [doubts, setDoubts] = useState([]);
 
   const { backendUrl, getToken, navigate } = useContext(AppContext);
-  useEffect(() => {
-    const fetchDoubts = async () => {
-      try {
-        const token = await getToken();
-        const { data } = await axios.get(
-          backendUrl + "/api/doubts/get-my-doubts",
 
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (data.success) {
-          setDoubts(data.doubts);
-          console.log(data.doubts);
-        } else {
-          toast.error(data.message);
+  const fetchDoubts = async () => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.get(
+        backendUrl + "/api/doubts/get-my-doubts",
+
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-      } catch (error) {
-        toast.error(error.message);
+      );
+      if (data.success) {
+        setDoubts(data.doubts);
+        toast.success(data.message);
+        console.log(data.doubts);
+      } else {
+        toast.error(data.message);
       }
-    };
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
+  useEffect(() => {
     fetchDoubts();
   }, []);
 
@@ -60,41 +62,56 @@ const MyDoubts = () => {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {doubts?.map((doubt, index) => (
-              <tr key={index} className="border-b border-gray-500/20">
-                <td className="px-4 py-3 max-sm:hidden">{doubt.queryTitle}</td>
-                <td className="px-4 py-3 max-sm:hidden">
-                  {doubt.queryDetails}
-                </td>
-                <td className="px-4 py-3 max-sm:hidden">
-                  {doubt.courseId?.courseTitle}
-                </td>
+            {doubts?.map((doubt, index) => {
+              const currentTime = new Date();
+              const scheduled = new Date(doubt.scheduledTime);
+              const isPast =
+                currentTime >= new Date(scheduled.getTime() - 15 * 60 * 1000);
+              const isFuture =
+                currentTime <= new Date(scheduled.getTime() + 15 * 60 * 1000);
+              const isWithinJoinTime = isPast && isFuture;
 
-                <td className="px-4 py-3 max-sm:hidden">
-                  {doubt.educatorId?.name}
-                </td>
-                <td className="px-4 py-3 max-sm:hidden space-y-1">
-                  {doubt.scheduledTime ? (
-                    <>
-                      <span className="block text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md w-max">
-                        Scheduled:{" "}
-                        {new Date(doubt.scheduledTime).toLocaleString()}
+              return (
+                <tr key={index} className="border-b border-gray-500/20">
+                  <td className="px-4 py-3 max-sm:hidden">
+                    {doubt.queryTitle}
+                  </td>
+                  <td className="px-4 py-3 max-sm:hidden">
+                    {doubt.queryDetails}
+                  </td>
+                  <td className="px-4 py-3 max-sm:hidden">
+                    {doubt.courseId?.courseTitle}
+                  </td>
+                  <td className="px-4 py-3 max-sm:hidden">
+                    {doubt.educatorId?.name}
+                  </td>
+                  <td className="px-4 py-3 max-sm:hidden space-y-1">
+                    {doubt.scheduledTime ? (
+                      <>
+                        <span className="block text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md w-max">
+                          Scheduled:{" "}
+                          {new Date(doubt.scheduledTime).toLocaleString()}
+                        </span>
+                        {doubt.scheduledTime && isWithinJoinTime && (
+                          <button
+                            onClick={() =>
+                              navigate(`/lobby`)
+                            }
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
+                          >
+                            Join Meet
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <span className="block text-sm font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-md w-max">
+                        Waiting for educator to schedule
                       </span>
-                      <Link
-                        to={`/video-call?room=${doubt.videoRoomId}`}
-                        className="inline-block mt-1 text-sm text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded shadow transition duration-200"
-                      >
-                        Join Video Call
-                      </Link>
-                    </>
-                  ) : (
-                    <span className="block text-sm font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-md w-max">
-                      Waiting for educator to schedule
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

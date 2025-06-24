@@ -1,10 +1,18 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AppContext } from "../../context/AppContext.jsx";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const DoubtsDashboard = () => {
-  const { backendUrl, navigate, getToken } = useContext(AppContext);
+  const { backendUrl, getToken } = useContext(AppContext);
+  const navigate = useNavigate();
+
   const [doubts, setDoubts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDoubtId, setSelectedDoubtId] = useState(null);
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [videoRoomId, setVideoRoomId] = useState("");
 
   const fetchDoubts = async () => {
     try {
@@ -17,7 +25,6 @@ const DoubtsDashboard = () => {
       );
       if (data.success) {
         setDoubts(data.doubts);
-        console.log(data.doubts);
       } else {
         toast.error(data.message);
       }
@@ -30,60 +37,189 @@ const DoubtsDashboard = () => {
     fetchDoubts();
   }, []);
 
-  const handleSchedule = async (id) => {
-    const dateTime = prompt("Enter meeting time (YYYY-MM-DD HH:MM)");
-    const roomId = prompt("Enter video room ID (e.g., course123-user456)");
+  const openModal = (doubtId) => {
+    setSelectedDoubtId(doubtId);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setScheduledTime("");
+    setVideoRoomId("");
+  };
+
+  const handleSchedule = async () => {
     try {
-      await axios.put(`/api/doubts/schedule/${id}`, {
-        scheduledTime: new Date(dateTime),
-        videoRoomId: roomId,
-      });
-      fetchDoubts();
+      const token = await getToken();
+      const { data } = await axios.put(
+        `${backendUrl}/api/doubts/schedule-doubt/${selectedDoubtId}`,
+        {
+          scheduledTime: new Date(scheduledTime),
+          videoRoomId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (data.success) {
+        fetchDoubts();
+        toast.success(data.message);
+        closeModal();
+      } else {
+        toast.error(data.message);
+      }
     } catch (err) {
-      alert("Failed to schedule");
+      toast.error(err.message);
     }
   };
 
   const handleResolve = async (id) => {
-    await axios.put(`/api/doubts/resolve/${id}`);
-    fetchDoubts();
+    try {
+      const token = await getToken();
+      const { data } = await axios.put(
+        `${backendUrl}/api/doubts/resolve-doubt/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (data.success) {
+        fetchDoubts();
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Student Doubts</h2>
-      {doubts.map((doubt) => (
-        <div key={doubt._id} className="border p-4 mb-3 rounded shadow">
-          <h3 className="font-semibold">{doubt.queryTitle}</h3>
-          <p>{doubt.queryDetails}</p>
-          <p className="text-sm text-gray-500">From: {doubt.studentId?.name}</p>
-          <p className="text-sm text-gray-500">
-            Course: {doubt.courseId?.courseTitle}
-          </p>
+    <div className="p-4 md:px-10">
+      <h2 className="text-2xl font-bold mb-6">Student Doubts</h2>
 
-          {!doubt.scheduledTime ? (
-            <button
-              className="bg-purple-500 text-white px-3 py-1 mt-2 rounded"
-              onClick={() => handleSchedule(doubt._id)}
-            >
-              Schedule Session
-            </button>
-          ) : (
-            <p className="text-green-600 mt-2">
-              Scheduled on: {new Date(doubt.scheduledTime).toLocaleString()}
-            </p>
-          )}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left border rounded shadow-md">
+          <thead className="bg-gray-100 border-b text-gray-700">
+            <tr>
+              <th className="px-4 py-3">Title</th>
+              <th className="px-4 py-3">Details</th>
+              <th className="px-4 py-3">Student</th>
+              <th className="px-4 py-3">Course</th>
+              <th className="px-4 py-3">Scheduled</th>
+              <th className="px-4 py-3">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {doubts.map((doubt) => {
+              const currentTime = new Date();
+              const scheduleTime = new Date(doubt.scheduledTime);
+              const isPast =
+                currentTime >=
+                new Date(scheduleTime.getTime() - 15 * 60 * 1000);
+              const isFuture =
+                currentTime <=
+                new Date(scheduleTime.getTime() + 15 * 60 * 1000);
+              const isWithinJoinTime = isPast && isFuture;
 
-          {!doubt.isResolved && (
-            <button
-              className="bg-green-500 text-white px-3 py-1 mt-2 ml-2 rounded"
-              onClick={() => handleResolve(doubt._id)}
-            >
-              Mark Resolved
-            </button>
-          )}
+              return (
+                <tr key={doubt._id} className="border-b hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-800">
+                    {doubt.queryTitle}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {doubt.queryDetails}
+                  </td>
+                  <td className="px-4 py-3">
+                    {doubt.studentId?.name || "N/A"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {doubt.courseId?.courseTitle || "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-green-600">
+                    {doubt.scheduledTime ? (
+                      new Date(doubt.scheduledTime).toLocaleString()
+                    ) : (
+                      <span className="text-yellow-600">Not scheduled</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 space-y-2">
+                    {!doubt.scheduledTime && (
+                      <button
+                        className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition"
+                        onClick={() => openModal(doubt._id)}
+                      >
+                        Schedule
+                      </button>
+                    )}
+                    {!doubt.isResolved && (
+                      <button
+                        className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition"
+                        onClick={() => handleResolve(doubt._id)}
+                      >
+                        Resolve
+                      </button>
+                    )}
+                    {doubt.isResolved && (
+                      <span className=" text-xs text-white bg-yellow-500 px-3 py-1 rounded w-max">
+                        Resolved
+                      </span>
+                    )}
+                    {doubt.scheduledTime && isWithinJoinTime && (
+                      <button
+                        onClick={() => navigate(`/lobby`)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
+                      >
+                        Join Meet
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white p-6 rounded-md shadow-md w-80">
+            <h3 className="text-lg font-semibold mb-4">
+              Schedule Doubt Session
+            </h3>
+            <label className="block mb-2 text-sm">Scheduled Time</label>
+            <input
+              type="datetime-local"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+              className="w-full px-3 py-2 border rounded mb-4"
+            />
+            <label className="block mb-2 text-sm">Room ID</label>
+            <input
+              type="text"
+              value={videoRoomId}
+              onChange={(e) => setVideoRoomId(e.target.value)}
+              placeholder="e.g., course123-user456"
+              className="w-full px-3 py-2 border rounded mb-4"
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={closeModal}
+                className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSchedule}
+                className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm"
+              >
+                Schedule
+              </button>
+            </div>
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };
