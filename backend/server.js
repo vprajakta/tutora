@@ -28,7 +28,7 @@ await connectCloudinary()
 //Middlewares
 app.use(
   cors({
-    origin: "https://tutora-blush.vercel.app",
+    origin: "https://tutora-ecru.vercel.app",
     methods: ["GET", "POST","PUT","DELETE"],
     credentials: true,
   })
@@ -41,7 +41,7 @@ const server = createServer(app);
 //Initialize IO
 const io = new Server(server, {
   cors: {
-    origin: "https://tutora-blush.vercel.app",
+    origin: "https://tutora-ecru.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
