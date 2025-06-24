@@ -25,7 +25,9 @@ export const AppContextProvider = (props) =>{
 
   const socket = useMemo(
     () =>
-      io('http://localhost:7000', {
+      io("https://tutora-backend.onrender.com", {
+        path: "/socket.io",
+        transports: ["websocket"],
         withCredentials: true,
       }),
     []
