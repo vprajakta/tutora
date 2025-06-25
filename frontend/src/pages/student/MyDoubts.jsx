@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { AppContext } from "../../context/AppContext.jsx";
+import { AppContext ,useSocket} from "../../context/AppContext.jsx";
 import { toast } from "react-toastify";
+import Loading from "../../components/student/Loading.jsx";
 
 const MyDoubts = () => {
   const [doubts, setDoubts] = useState([]);
-
+  const socket = useSocket();
   const { backendUrl, getToken, navigate } = useContext(AppContext);
 
   const fetchDoubts = async () => {
@@ -30,12 +31,27 @@ const MyDoubts = () => {
       toast.error(error.message);
     }
   };
+  const handleJoinMeet = useCallback((roomId, email) => {
+    if (!email || !roomId) {
+      toast.error("Missing email or room ID");
+      return;
+    }
+    socket.emit("room:join", { email: email, room: roomId });
+    navigate(`/room/${roomId}`);
+  },[navigate]);
 
   useEffect(() => {
     fetchDoubts();
   }, []);
 
-  return (
+  useEffect(()=>{
+          socket.on("room:join", handleJoinMeet);
+          return () => {
+              socket.off('room:join',handleJoinMeet)
+          }
+      },[socket,handleJoinMeet])
+
+  return doubts ? (
     <>
       <div className="md:px-36 px-8 pt-10">
         <h1 className="text-2xl font-semibold">My Doubts</h1>
@@ -66,9 +82,9 @@ const MyDoubts = () => {
               const currentTime = new Date();
               const scheduled = new Date(doubt.scheduledTime);
               const isPast =
-                currentTime >= new Date(scheduled.getTime() - 15 * 60 * 1000);
+                currentTime >= new Date(scheduled.getTime() - 1000 * 60 * 1000);
               const isFuture =
-                currentTime <= new Date(scheduled.getTime() + 15 * 60 * 1000);
+                currentTime <= new Date(scheduled.getTime() + 1000 * 60 * 1000);
               const isWithinJoinTime = isPast && isFuture;
 
               return (
@@ -77,7 +93,11 @@ const MyDoubts = () => {
                     {doubt.queryTitle}
                   </td>
                   <td className="px-4 py-3 max-sm:hidden">
-                    {doubt.queryDetails}
+                    <p
+                      dangerouslySetInnerHTML={{
+                        __html: doubt.queryDetails.slice(0, 200),
+                      }}
+                    ></p>
                   </td>
                   <td className="px-4 py-3 max-sm:hidden">
                     {doubt.courseId?.courseTitle}
@@ -88,14 +108,23 @@ const MyDoubts = () => {
                   <td className="px-4 py-3 max-sm:hidden space-y-1">
                     {doubt.scheduledTime ? (
                       <>
-                        <span className="block text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md w-max">
-                          Scheduled:{" "}
-                          {new Date(doubt.scheduledTime).toLocaleString()}
-                        </span>
+                        {!doubt.isResolved && (
+                          <span className="block text-sm font-medium text-blue-600 bg-blue-50  px-2 py-1 rounded-md w-max">
+                            Scheduled:{" "}
+                            {new Date(doubt.scheduledTime).toLocaleString()}
+                          </span>
+                        )}
+                        {doubt.isResolved && (
+                          <span className="block text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md w-max">
+                            Resolved By Educator {doubt.educatorId.name}
+                          </span>
+                        )}
                         {doubt.scheduledTime && isWithinJoinTime && (
                           <button
                             onClick={() =>
-                              navigate(`/lobby`)
+                              handleJoinMeet(
+                                doubt?.videoRoomId,doubt?.studentId?.email
+                              )
                             }
                             className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
                           >
@@ -116,7 +145,10 @@ const MyDoubts = () => {
         </table>
       </div>
     </>
-  );
-};
+  ) : (
+    <Loading/>
+  )
+
+}
 
 export default MyDoubts;

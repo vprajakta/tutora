@@ -41,7 +41,7 @@ export const createDoubt = async (req,res) => {
 export const getDoubtsForEducator = async (req,res) => {
     try {
         const educatorId = req.auth().userId;
-        const doubts = await Doubt.find({educatorId}).populate('studentId courseId')
+        const doubts = await Doubt.find({educatorId}).populate('studentId courseId educatorId videoRoomId')
 
         res.json({success:true, doubts});
     } catch (error) {
@@ -56,7 +56,7 @@ export const getDoubtsForEducator = async (req,res) => {
 export const getDoubtsForStudent = async (req,res) => {
     try {
         const studentId = req.auth().userId;
-        const doubts = await Doubt.find({studentId}).populate('courseId educatorId')
+        const doubts = await Doubt.find({studentId}).populate('courseId educatorId videoRoomId studentId')
 
         res.json({success:true, doubts})
     } catch (error) {

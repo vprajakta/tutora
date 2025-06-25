@@ -26,22 +26,40 @@ await connectDB()
 await connectCloudinary()
 
 //Middlewares
+// app.use(
+//   cors({
+//     origin: "https://tutora-ecru.vercel.app",
+//     methods: ["GET", "POST","PUT","DELETE"],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: "https://tutora-ecru.vercel.app",
-    methods: ["GET", "POST","PUT","DELETE"],
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
+
 app.use(clerkMiddleware())
 app.use("/clerk", bodyParser.raw({ type: "application/json" }));
 
 const server = createServer(app);
 
 //Initialize IO
+// const io = new Server(server, {
+//   cors: {
+//     origin: "https://tutora-ecru.vercel.app",
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     credentials: true,
+//   },
+// });
+
 const io = new Server(server, {
   cors: {
-    origin: "https://tutora-ecru.vercel.app",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
@@ -52,13 +70,17 @@ const socketidToEmailMap = new Map();
 //establish the connection
 
 io.on("connection", (socket) => {
-  console.log(`Socket Connected`, socket.id);
+  console.log(`Socket Connected ${socket.id}`);
   socket.on("room:join", (data) => {
     const { email, room } = data;
+    if (!email || !room) return;
     emailToSocketIdMap.set(email, socket.id);
     socketidToEmailMap.set(socket.id, email);
-    io.to(room).emit("user:joined", { email, id: socket.id });
+
     socket.join(room);
+    
+    io.to(room).emit("user:joined", { email, id: socket.id });
+    
     io.to(socket.id).emit("room:join", data);
   });
 

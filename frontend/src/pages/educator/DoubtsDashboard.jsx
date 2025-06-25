@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import axios from "axios";
-import { AppContext } from "../../context/AppContext.jsx";
+import { AppContext, useSocket } from "../../context/AppContext.jsx";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/student/Loading.jsx";
 
 const DoubtsDashboard = () => {
   const { backendUrl, getToken } = useContext(AppContext);
+  const socket = useSocket();
   const navigate = useNavigate();
 
   const [doubts, setDoubts] = useState([]);
@@ -13,6 +15,8 @@ const DoubtsDashboard = () => {
   const [selectedDoubtId, setSelectedDoubtId] = useState(null);
   const [scheduledTime, setScheduledTime] = useState("");
   const [videoRoomId, setVideoRoomId] = useState("");
+
+  
 
   const fetchDoubts = async () => {
     try {
@@ -39,6 +43,8 @@ const DoubtsDashboard = () => {
 
   const openModal = (doubtId) => {
     setSelectedDoubtId(doubtId);
+    const generateRoomId = `${doubtId}-${Date.now()}`;
+    setVideoRoomId(generateRoomId)
     setShowModal(true);
   };
 
@@ -94,7 +100,32 @@ const DoubtsDashboard = () => {
     }
   };
 
-  return (
+  const handleJoinMeet = useCallback(
+    (roomId, educatorEmail) => {
+      if (!roomId) {
+        toast.error("Missing room");
+        return;
+      }
+      console.log(roomId);
+      if (!educatorEmail) {
+        toast.error("Missing email");
+        return;
+      }
+
+      socket.emit("room:join", { email: educatorEmail, room: roomId });
+      navigate(`/room/${roomId}`);
+    },
+    [navigate]
+  );
+
+  useEffect(() => {
+    socket.on("room:join", handleJoinMeet);
+    return () => {
+      socket.off("room:join", handleJoinMeet);
+    };
+  }, [socket, handleJoinMeet]);
+
+  return doubts ? (
     <div className="p-4 md:px-10">
       <h2 className="text-2xl font-bold mb-6">Student Doubts</h2>
 
@@ -116,10 +147,10 @@ const DoubtsDashboard = () => {
               const scheduleTime = new Date(doubt.scheduledTime);
               const isPast =
                 currentTime >=
-                new Date(scheduleTime.getTime() - 15 * 60 * 1000);
+                new Date(scheduleTime.getTime() - 1000 * 60 * 1000);
               const isFuture =
                 currentTime <=
-                new Date(scheduleTime.getTime() + 15 * 60 * 1000);
+                new Date(scheduleTime.getTime() + 1000 * 60 * 1000);
               const isWithinJoinTime = isPast && isFuture;
 
               return (
@@ -128,7 +159,12 @@ const DoubtsDashboard = () => {
                     {doubt.queryTitle}
                   </td>
                   <td className="px-4 py-3 text-gray-700">
-                    {doubt.queryDetails}
+                    <p
+                      dangerouslySetInnerHTML={{
+                        __html: doubt.queryDetails.slice(0, 200),
+                      }}
+                    ></p>
+                    
                   </td>
                   <td className="px-4 py-3">
                     {doubt.studentId?.name || "N/A"}
@@ -167,7 +203,7 @@ const DoubtsDashboard = () => {
                     )}
                     {doubt.scheduledTime && isWithinJoinTime && (
                       <button
-                        onClick={() => navigate(`/lobby`)}
+                        onClick={() => handleJoinMeet(doubt?.videoRoomId,doubt.educatorId?.email)}
                         className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
                       >
                         Join Meet
@@ -199,7 +235,7 @@ const DoubtsDashboard = () => {
             <input
               type="text"
               value={videoRoomId}
-              onChange={(e) => setVideoRoomId(e.target.value)}
+              readOnly
               placeholder="e.g., course123-user456"
               className="w-full px-3 py-2 border rounded mb-4"
             />
@@ -221,7 +257,11 @@ const DoubtsDashboard = () => {
         </div>
       )}
     </div>
-  );
+    
+  )
+  : (
+    <Loading/>
+  )
 };
 
 export default DoubtsDashboard;

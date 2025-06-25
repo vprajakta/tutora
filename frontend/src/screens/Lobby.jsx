@@ -26,7 +26,7 @@ const Lobby = () => {
         return () => {
             socket.off('room:join',handleJoinRoom)
         }
-    },[socket])
+    },[socket,handleJoinRoom])
   return (
     <div className="flex flex-col items-center mt-10 ">
       <h1>Lobby</h1>
