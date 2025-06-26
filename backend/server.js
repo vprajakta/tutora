@@ -120,7 +120,7 @@ app.use("/api/doubts", express.json(), doubtRouter);
 
 
 
-app.post('/stripe',bodyParser.raw({type: 'application/json'}),stripeWebhooks)
+app.post('/stripe',express.raw({type: 'application/json'}),stripeWebhooks)
 
 
 
