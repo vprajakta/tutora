@@ -45,6 +45,7 @@ const Room = () => {
         audio: true,
         video: true,
       });
+      
       const offer = await peer.getOffer();
       socket.emit("user:call", { to: remoteSocketId, offer });
       setMyStream(stream);
