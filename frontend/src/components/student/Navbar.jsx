@@ -38,8 +38,8 @@ const Navbar = () => {
   console.log(location.pathname);
   return (
     <div
-      className={`flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 py-4 ${
-        isCourseListPage ? "bg-white" : "bg-cyan-100/70"
+      className={`sticky top-0 z-50 backdrop-blur-md bg-white-100/90 shadow-md transition-all  duration-300 flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 py-4 ${
+        isCourseListPage ? "bg-white/80" : "bg-cyan-100/60"
       }`}
     >
       <img
@@ -54,8 +54,8 @@ const Navbar = () => {
             <button className="cursor-pointer" onClick={becomeEducator}>
               {isEducator ? "Educator Dashboard" : "Become Educator"}
             </button>
-            | <Link to="/my-enrollments">My Enrollments</Link>
-            | <Link to="/my-doubts">My Doubts</Link>
+            | <Link to="/my-enrollments">My Enrollments</Link>|{" "}
+            <Link to="/my-doubts">My Doubts</Link>
           </div>
         )}
         {user ? (
@@ -63,7 +63,7 @@ const Navbar = () => {
         ) : (
           <button
             onClick={() => openSignIn()}
-            className="bg-blue-600 text-white px-5 py-2 rounded-full"
+            className="bg-blue-600 text-white px-5 py-2 rounded-full cursor-pointer"
           >
             Create Account
           </button>

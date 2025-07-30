@@ -126,7 +126,7 @@ const MyDoubts = () => {
                                 doubt?.videoRoomId,doubt?.studentId?.email
                               )
                             }
-                            className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition cursor-pointer"
                           >
                             Join Meet
                           </button>

@@ -104,6 +104,17 @@ const Room = () => {
       await peer.setLocalDescription(ans);
     }, []);
 
+    const handleCallEnded = ()=>{
+      
+      myStream?.getTracks().forEach((track) => track.stop());
+      remoteStream?.getTracks().forEach((track) => track.stop());
+      setMyStream(null);
+      setRemoteStream(null);
+      
+      navigate("/");
+      
+    }
+
     useEffect(() => {
       peer.peer.addEventListener("track", async (ev) => {
         const remoteStream = ev.streams;
@@ -118,13 +129,15 @@ const Room = () => {
       socket.on("call:accepted", handleCallAccepted);
       socket.on("peer:nego:needed", handleNegoNeedIncomming);
       socket.on("peer:nego:final", handleNegoNeedFinal);
-
+      
+      
       return () => {
         socket.off("user:joined", handleUserJoined);
         socket.off("incomming:call", handleIncommingCall);
         socket.off("call:accepted", handleCallAccepted);
         socket.off("peer:nego:needed", handleNegoNeedIncomming);
         socket.off("peer:nego:final", handleNegoNeedFinal);
+        
       };
     }, [
       socket,
@@ -312,7 +325,7 @@ const Room = () => {
             <>
               <button
                 onClick={sendStreams}
-                className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded transition"
+                className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded transition cursor-pointer"
               >
                 Send Stream
               </button>
@@ -326,7 +339,7 @@ const Room = () => {
                     .forEach((track) => (track.enabled = enabled));
                   setAudioEnabled(enabled);
                 }}
-                className="bg-gray-200 hover:bg-gray-300 text-black p-3 rounded-full shadow"
+                className="bg-gray-200 hover:bg-gray-300 text-black p-3 rounded-full shadow cursor-pointer"
               >
                 {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
               </button>
@@ -340,7 +353,7 @@ const Room = () => {
                     .forEach((track) => (track.enabled = enabled));
                   setVideoEnabled(enabled);
                 }}
-                className="bg-gray-200 hover:bg-gray-300 text-black p-3 rounded-full shadow"
+                className="bg-gray-200 hover:bg-gray-300 text-black p-3 rounded-full shadow cursor-pointer"
               >
                 {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
               </button>
@@ -369,7 +382,7 @@ const Room = () => {
                       console.error("Error sharing screen:", err);
                     }
                   }}
-                  className="bg-gray-200 hover:bg-gray-300 text-black p-3 rounded-full shadow"
+                  className="bg-gray-200 hover:bg-gray-300 text-black p-3 rounded-full shadow cursor-pointer"
                 >
                   <IoShare />
                 </button>
@@ -377,14 +390,8 @@ const Room = () => {
 
               {/* End Call */}
               <button
-                onClick={() => {
-                  myStream.getTracks().forEach((track) => track.stop());
-                  remoteStream?.getTracks().forEach((track) => track.stop());
-                  setMyStream(null);
-                  setRemoteStream(null);
-                  navigate("/");
-                }}
-                className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow"
+                onClick={() => handleCallEnded()}
+                className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow cursor-pointer"
               >
                 <MdCallEnd />
               </button>
@@ -395,7 +402,7 @@ const Room = () => {
           {remoteSocketId && !myStream && (
             <button
               onClick={handleCallUser}
-              className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow"
+              className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow cursor-pointer"
             >
               <IoCall />
             </button>
