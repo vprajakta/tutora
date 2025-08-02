@@ -24,7 +24,7 @@ const Sidebar = () => {
     {
       name: "Doubts Section",
       path: "/educator/doubts-dashboard",
-      icon: assets.person_tick_icon,
+      icon: assets.que,
     },
   ];
   return isEducator && (

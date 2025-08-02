@@ -44,7 +44,7 @@ const Navbar = () => {
     >
       <img
         onClick={() => navigate("/")}
-        src={assets.logo}
+        src={assets.nlogo}
         alt="logo"
         className="w-28 lg:w-32 cursor-pointer "
       />

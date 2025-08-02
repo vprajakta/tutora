@@ -18,7 +18,7 @@ const Hero = () => {
       <p className="md:block hidden max-w-2xl mx-auto text-gray-500">
         Experience the future of education with{" "}
         <span className="font-serif text-indigo-600 text-2xl font-semibold italic tracking-wide drop-shadow-sm hover:text-indigo-700 transition-colors duration-300">
-          Scholarly
+          tutorra
         </span>{" "}
         — a modern tutoring platform powered by WebRTC and MERN stack, offering
         real-time mentoring, interactive screen sharing, and recorded sessions

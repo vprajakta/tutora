@@ -43,11 +43,16 @@ import profile_img2 from './profile_img2.png'
 import profile_img3 from './profile_img3.png'
 import lesson_icon from './lesson_icon.svg'
 //import lg from './SCHOLARLY(1).png'
-import logo1 from './scholarly.svg'
+import tutorra_logo from './tutorra_logo.svg'
+import logo1 from './logo.png'
+import nlogo from './nlogo.png'
+import que from './question.png'
 
 export const assets = {
+    que,
+    tutorra_logo,
     logo1,
-    logo,
+    nlogo,
     search_icon,
     sketch,
     microsoft_logo,
